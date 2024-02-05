@@ -89,8 +89,8 @@ class App {
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
-    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
     sidebar.addEventListener('click', this._deleteAllWorkouts.bind(this));
+    containerWorkouts.addEventListener('click', this._deleteWorkout.bind(this));
   }
 
   _getPosition() {
@@ -131,7 +131,6 @@ class App {
   }
 
   _hideForm() {
-    // Empty the input fields
     // prettier-ignore
     inputDistance.value = inputDuration.value = inputDuration.value = inputElevation.value = '';
     form.style.display = 'none';
@@ -166,9 +165,6 @@ class App {
 
       // Check if data is valid
       if (
-        // !Number.isFinite(distance) ||
-        // !Number.isFinite(duration) ||
-        // !Number.isFinite(cadence)
         !validInputs(distance, duration, cadence) ||
         !allPositive(distance, duration, cadence)
       )
@@ -202,8 +198,6 @@ class App {
 
     //Set local storage to all workouts
     this._setLocalStorage();
-
-    console.log(workout.id);
   }
 
   _renderWorkoutMarker(workout) {
@@ -224,7 +218,6 @@ class App {
       .openPopup();
 
     this.#markers.push(marker);
-    console.log(this.#markers);
   }
 
   _renderWorkout(workout) {
@@ -233,22 +226,20 @@ class App {
       
         <h2 class="workout__title">${workout.description}</h2>
 
-        <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke-width="1.5"
-        stroke="currentColor"
-        class="close-btn"
-        data-id="${workout.id}"
-  "
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M6 18 18 6M6 6l12 12"
-        />
-      </svg>
+        <div class="close-btn" data-id="${workout.id}">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor">
+        
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 18 18 6M6 6l12 12"/>
+          </svg>
+        </div>
 
         <div class="workout__details">
           <span class="workout__icon">${
@@ -298,11 +289,12 @@ class App {
     if (this.#workouts.length >= 2) deleteAllBtn.classList.remove('hidden');
   }
 
-  //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete a workout 🔥🔥🔥🔥🔥🔥🔥🔥🔥
+  //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete a workout 🔥🔥🔥🔥🔥🔥
   _deleteWorkout(e) {
     const close = e.target.closest('.close-btn');
     const workoutElement = e.target.closest('.workout');
     const workoutId = close.dataset.id;
+    console.log(workoutId);
 
     // if the clicking happens anywhere other than the button, ignore it
     if (!close) return; // guard clause
@@ -311,7 +303,7 @@ class App {
 
     // Remove element from sidebar
     const removeWorkout = this.#workouts.findIndex(
-      workout => workout.id === close.dataset.id
+      workout => workout.id === workoutId
     );
 
     // Check if the workout is found before attempting to remove it
@@ -320,18 +312,18 @@ class App {
       this.#workouts.splice(removeWorkout, 1);
     }
 
+    // remove marker
     const marker = this.#markers.find(m => m.options.id === workoutId);
     this.#map.removeLayer(marker);
 
-    ////////////////////////////////////
+    // remove from local storage
+    localStorage.removeItem('workoutElement');
   }
 
-  //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete ALL workouts 🔥🔥🔥🔥🔥🔥🔥🔥🔥
+  //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete ALL workouts 🔥🔥🔥🔥🔥🔥
   _deleteAllWorkouts(e) {
     const deleteAll = e.target.closest('.delete-all-btn');
-
     if (!deleteAll) return;
-    console.log('You clicked on the button alright.');
 
     containerWorkouts.style.display = 'none';
     deleteAllBtn.classList.add('hidden');
@@ -342,9 +334,8 @@ class App {
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
     if (!workoutEl) return;
-    const workout = this.#workouts.find(
-      work => work.id === workoutEl.dataset.id
-    );
+
+    const workout = this.#workouts.find(work => work.id === workoutEl.id);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
       animate: true,
