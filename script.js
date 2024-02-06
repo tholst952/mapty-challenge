@@ -293,27 +293,23 @@ class App {
   _deleteWorkout(e) {
     const close = e.target.closest('.close-btn');
     const workoutElement = e.target.closest('.workout');
-    const workoutId = close.dataset.id;
-    console.log(workoutId);
+    // const workoutId = close.dataset.id;
+    // console.log(workoutId);
 
     // if the clicking happens anywhere other than the button, ignore it
     if (!close) return; // guard clause
 
-    workoutElement.style.display = 'none';
-
     // Remove element from sidebar
     const removeWorkout = this.#workouts.findIndex(
-      workout => workout.id === workoutId
+      workout => workout.id === close.dataset
     );
 
-    // Check if the workout is found before attempting to remove it
-    if (removeWorkout !== -1) {
-      // -1 = element not found
-      this.#workouts.splice(removeWorkout, 1);
-    }
+    this.#workouts.splice(removeWorkout, 1);
+
+    workoutElement.style.display = 'none';
 
     // remove marker
-    const marker = this.#markers.find(m => m.options.id === workoutId);
+    const marker = this.#markers.find(m => m.options.id === workoutElement.id);
     this.#map.removeLayer(marker);
 
     // remove from local storage
