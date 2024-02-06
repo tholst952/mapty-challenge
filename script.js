@@ -313,8 +313,8 @@ class App {
     const marker = this.#markers.find(m => m.options.id === workoutElement.id);
     this.#map.removeLayer(marker);
 
-    // remove from local storage
-    localStorage.removeItem(workoutElement.id);
+    // remove from local storage ////NEEDS WORK!! 🔥
+    localStorage.removeItem('workouts');
   }
 
   //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete ALL workouts 🔥🔥🔥🔥🔥🔥
@@ -346,21 +346,28 @@ class App {
   }
 
   _setLocalStorage() {
-    this.#workouts.forEach(workout =>
-      localStorage.setItem(workout.id, JSON.stringify(workout))
-    );
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
 
+  //////////////// work in progress 🔥🔥🔥🔥🔥🔥
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
     if (!data) return; // guard clause
     this.#workouts = data;
 
-    // Render the workouts in the sidebar
-    this.#workouts.forEach(work => {
-      this._renderWorkout(work);
+    Object.values(data).forEach(workout => {
+      this._renderWorkout(workout);
     });
+
+    // // Render the workouts in the sidebar
+    // this.#workouts.forEach(workout => {
+    //   workout =
+    //     workout.type === 'running'
+    //       ? Object.setPrototypeOf(workout, Running.prototype)
+    //       : Object.setPrototypeOf(workout, Cycling.prototype);
+    //   this._renderWorkout(work);
+    // });
   }
 
   reset() {
