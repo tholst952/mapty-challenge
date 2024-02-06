@@ -296,23 +296,25 @@ class App {
 
     // if the clicking happens anywhere other than the button, ignore it
     if (!close) return;
+
+    // find the index of workout and remove it
     const workoutIndex = this.#workouts.findIndex(
       w => w.id === workoutElement.id
     );
-
     if (workoutIndex !== -1) {
       this.#workouts.splice(workoutIndex, 1);
       console.log(this.#workouts);
     }
 
+    // remove element from the DOM
     workoutElement.remove();
 
-    // remove marker
+    // remove marker from the map
     const marker = this.#markers.find(m => m.options.id === workoutElement.id);
     this.#map.removeLayer(marker);
 
     // remove from local storage
-    localStorage.removeItem('workoutElement');
+    localStorage.removeItem(workoutElement.id);
   }
 
   //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete ALL workouts 🔥🔥🔥🔥🔥🔥
@@ -320,9 +322,9 @@ class App {
     const deleteAll = e.target.closest('.delete-all-btn');
     if (!deleteAll) return;
 
-    containerWorkouts.style.display = 'none';
+    this.#workouts = [];
     deleteAllBtn.classList.add('hidden');
-    localStorage.removeItem('workouts');
+    localStorage.clear();
     this.reset();
   }
 
@@ -344,7 +346,9 @@ class App {
   }
 
   _setLocalStorage() {
-    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+    this.#workouts.forEach(workout =>
+      localStorage.setItem(workout.id, JSON.stringify(workout))
+    );
   }
 
   _getLocalStorage() {
