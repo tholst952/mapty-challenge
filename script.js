@@ -291,7 +291,6 @@ class App {
 
   //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete a workout 🔥🔥🔥🔥🔥🔥
   _deleteWorkout(e) {
-    e.preventDefault();
     const close = e.target.closest('.close-btn');
     const workoutElement = e.target.closest('.workout');
 
