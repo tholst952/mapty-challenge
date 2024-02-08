@@ -291,6 +291,7 @@ class App {
 
   //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete a workout 🔥🔥🔥🔥🔥🔥
   _deleteWorkout(e) {
+    e.preventDefault();
     const close = e.target.closest('.close-btn');
     const workoutElement = e.target.closest('.workout');
 
@@ -303,7 +304,7 @@ class App {
     );
     if (workoutIndex !== -1) {
       this.#workouts.splice(workoutIndex, 1);
-      console.log(this.#workouts);
+      // console.log(this.#workouts);
     }
 
     // remove element from the DOM
@@ -313,8 +314,27 @@ class App {
     const marker = this.#markers.find(m => m.options.id === workoutElement.id);
     this.#map.removeLayer(marker);
 
-    // remove from local storage ////NEEDS WORK!! 🔥
-    localStorage.removeItem('workouts');
+    // remove from local storage //// 🔥
+    this._removeWorkoutById(workoutElement.id);
+  }
+
+  _removeWorkoutById(idToRemove) {
+    // 1. retrieve the array of workouts from local storage and parse string
+    const storedWorkoutsString = localStorage.getItem('workouts');
+    const storedWorkouts = JSON.parse(storedWorkoutsString);
+    console.log(storedWorkouts);
+
+    // 2. find the specific workout with the matching ID
+    // 3. remove it from the array
+    if (Array.isArray(storedWorkouts) && storedWorkouts.length > 0) {
+      const indexToRemove = storedWorkouts.findIndex(w => w.id === idToRemove);
+      if (indexToRemove !== -1) {
+        storedWorkouts.splice(indexToRemove, 1);
+      }
+    }
+
+    // 4. store the updated array back in local storage
+    localStorage.setItem('workouts', JSON.stringify(storedWorkouts));
   }
 
   //🔥🔥🔥🔥🔥🔥 CHALLENGE to delete ALL workouts 🔥🔥🔥🔥🔥🔥
@@ -331,7 +351,6 @@ class App {
   _moveToPopup(e) {
     const workoutEl = e.target.closest('.workout');
     if (!workoutEl) return;
-
     const workout = this.#workouts.find(work => work.id === workoutEl.id);
 
     this.#map.setView(workout.coords, this.#mapZoomLevel, {
@@ -349,14 +368,11 @@ class App {
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
 
-  //////////////// work in progress 🔥🔥🔥🔥🔥🔥
   _getLocalStorage() {
     const data = JSON.parse(localStorage.getItem('workouts'));
 
     if (!data) return; // guard clause
     this.#workouts = data;
-
-    console.log(data);
 
     // Render the workouts in the sidebar
     data.forEach(workout => {
