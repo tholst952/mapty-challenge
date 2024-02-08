@@ -356,18 +356,15 @@ class App {
     if (!data) return; // guard clause
     this.#workouts = data;
 
-    Object.values(data).forEach(workout => {
+    console.log(data);
+
+    // Render the workouts in the sidebar
+    data.forEach(workout => {
+      workout.type === 'running'
+        ? Object.setPrototypeOf(workout, Running.prototype)
+        : Object.setPrototypeOf(workout, Cycling.prototype);
       this._renderWorkout(workout);
     });
-
-    // // Render the workouts in the sidebar
-    // this.#workouts.forEach(workout => {
-    //   workout =
-    //     workout.type === 'running'
-    //       ? Object.setPrototypeOf(workout, Running.prototype)
-    //       : Object.setPrototypeOf(workout, Cycling.prototype);
-    //   this._renderWorkout(work);
-    // });
   }
 
   reset() {
